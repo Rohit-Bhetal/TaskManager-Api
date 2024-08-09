@@ -1,5 +1,5 @@
 const {Schema,model} = require('mongoose');
-const validator = require
+const validator = require('validator');
 
 const userSchema = new Schema(
     {
