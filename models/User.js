@@ -1,5 +1,8 @@
 const {Schema,model} = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcrypt');
+const jwt= require('jsonwebtoken')
+
 
 const userSchema = new Schema(
     {
@@ -41,7 +44,7 @@ const userSchema = new Schema(
                 }
             }
         },
-        token:[
+        tokens:[
             {
                 token:{
                     type:String,
@@ -75,3 +78,41 @@ userSchema.methods.toJSON=function(){
     delete userObject.avatar;
     return userObject;
 }
+
+userSchema.methods.generateAuthtoken = async function(){
+    const token = await jwt.sign({
+        _id:this._id.toString()
+    },process.env.JWT_SECRET_KEY);
+    this.token=this.tokens.concat({token});
+    await this.save();
+    return token;
+}
+
+userSchema.statics.findByLoginCredentials = async function(email,password){
+    const user= await this.findOne({email});
+    if(!user){
+        throw new Error('Unable to Login');
+    }
+    const verifyPassword = await bcrypt.compare(password,user.password);
+    if(!verifyPassword){
+        throw new Error('Unable to Login');
+    }
+    return user;
+}
+
+// Hash the plain text password before saving
+userSchema.pre('save',async function(next){
+    if(this.isModified('password')){
+        this.password = await bcrypt.hash(this.password,10)
+    }
+    next();
+});
+
+//Delete user's tasks when user is removed
+
+userSchema.pre('remove',async function(next){
+    await Task.deleteMany({owner:this._id});
+});
+
+
+module.exports = model('User',userSchema);

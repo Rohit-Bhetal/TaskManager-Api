@@ -52,3 +52,7 @@ exports.getSingleTask=async(req,res)=>{
         return res.status(500).json({status:'fail',error})
     }
 }
+
+exports.updateTask =async(req,res)=>{
+    //const updates= 
+}
