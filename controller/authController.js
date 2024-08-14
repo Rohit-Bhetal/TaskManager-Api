@@ -10,7 +10,7 @@ exports.createAccount=async(req,res) =>{
         if(!user){
             throw new Error('Unable to create Account!')
         }
-        const token = await user.generateAuthToken();
+        const token = await user.generateAuthtoken();
         res.status(201).json({
             status:'success',user,token
         })
@@ -18,7 +18,7 @@ exports.createAccount=async(req,res) =>{
     }catch(error){
         res.status(400).json({
             status:'fail',
-            error
+            error:error.message
         })
     }
 }
