@@ -31,7 +31,7 @@ exports.login=async(req,res)=>{
             req.body.email,
             req.body.password
         );
-        const token = await user.generateAuthToken();
+        const token = await user.generateAuthtoken();
         res.status(200).json({
             status:'success',
             user,
